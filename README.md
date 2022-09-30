@@ -1,73 +1,110 @@
-[English](README_en.md) | 中文
+# 【飞桨特色模型挑战赛】Channel-wise Topology Refinement Graph Convolution for Skeleton-Based Action Recognition
 
-# PaddleVideo
+---
+## 内容
+- [轻量化方法介绍](#轻量化方法介绍)
+- [模型精度](#模型精度)
+- [数据准备](#数据准备)
+- [模型训练](#模型训练)
+- [模型测试](#模型测试)
+- [模型推理](#模型推理)
 
-![python version](https://img.shields.io/badge/python-3.7+-orange.svg) ![paddle version](https://img.shields.io/badge/PaddlePaddle-2.3.1-blue)
+## 轻量化方法介绍
+本repo通过精简模型结构、数据增强、模型蒸馏和最小化转静态模型的方法，在inference模型小于10M条件下，在NTU-RGB+D数据集，joint模态，X-sub评测标准，Top1 acc达到 *90.87* 
+- 精简模型结构：去掉backbone的l10(第十层TCN_GCN_unit)
+- 数据增强：使用mixup方法
+- 模型蒸馏：使用dml方法，初始化权重为89.93的Paddlevideo精度CTRGCN的模型
+- 最小化导出：使用nn.Sequential定义的模型导出静态图模型尺寸小于nn.Layer定义的导出
+## 模型精度
+| split | modality | Top-1 |                                                   checkpoints                                                   |
+| :----: | :----: |:-----:|:---------------------------------------------------------------------------------------------------------------:|
+| cross-subject | joint | 90.87 | [CTRGCNLiteJoint_best.pdparams](https://pan.baidu.com/s/1qCed-vpQ1dEz7GpKNr20LQ?pwd=3dtv) |
+### 模型和日志
+[下载地址](https://pan.baidu.com/s/1qCed-vpQ1dEz7GpKNr20LQ?pwd=3dtv)
+- CTRGCN_ntucs_joint_dml.pdparams：初始化的权重，转至PaddleVideo训练好的[模型](https://videotag.bj.bcebos.com/PaddleVideo-release2.3/CTRGCN_ntucs_joint.pdparams)
+- train.log： 日志
+- CTRGCNLiteJoint.pd*： inference_model文件
+## 数据准备
 
-## 简介
+NTU-RGBD数据下载及准备请参考[NTU-RGBD数据准备](dataset/ntu-rgbd.md)
 
-PaddleVideo旨在打造一套丰富、领先且实用的Video工具库，旨在帮助开发者更好的进行视频领域的学术研究和产业实践。
+## 模型训练
 
-<div align="center">
-  <img src="docs/images/home.gif" width="450px"/><br>
-</div>
+### NTU-RGBD数据集训练
 
-## 近期更新
+- NTU-RGBD数据集单卡训练，启动命令如下：
 
-- 发布轻量化行为识别模型**🔥[PP-TSMv2](./docs/zh-CN/model_zoo/recognition/pp-tsm_v2.md)**, Kinetics-400精度74.38%，25fps的10s视频cpu推理时间仅需433ms.各模型性能对比[benchmark](./docs/zh-CN/benchmark.md).
-- 新增[知识蒸馏](./docs/zh-CN/distillation.md)功能.
-- 新增基于transformer的行为识别模型[TokenShift](https://github.com/PaddlePaddle/PaddleVideo/blob/develop/docs/zh-CN/model_zoo/recognition/tokenshift_transformer.md).
-- 新增基于骨骼点的行为识别模型[2s-ACGN](https://github.com/PaddlePaddle/PaddleVideo/blob/develop/docs/zh-CN/model_zoo/recognition/agcn2s.md)、[CTR-GCN](./docs/zh-CN/model_zoo/recognition/ctrgcn.md).
+```bash
+# joint modality
+python main.py --validate -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml \
+-w data/CTRGCN_ntucs_joint_dml.pdparams
+```
+## 模型测试
+
+### NTU-RGB+D数据集模型测试
+
+- 模型测试的启动命令如下：
+
+```bash
+# joint modality
+python3.7 main.py --test -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml \
+-w output/CTRGCNLiteJoint/CTRGCNLiteJoint_best.pdparams  
+```
+
+## 模型推理
+
+### 导出inference模型
+
+```bash
+python3.7 tools/minimal_export_model.py -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml \
+                                -p output/CTRGCNLiteJoint/CTRGCNLiteJoint_best.pdparams \
+                                -o inference/CTRGCNLite
+```
+上述命令将生成预测所需的模型结构文件`CTRGCNLiteJoint.pdmodel`和模型权重文件`CTRGCNLiteJoint.pdiparams`。模型大小为9.9M
+
+- 各参数含义可参考[模型推理方法](https://github.com/PaddlePaddle/PaddleVideo/blob/release/2.0/docs/zh-CN/start.md#2-%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86)
+
+### 使用预测引擎推理
+
+```bash
+python3.7 tools/predict.py --input_file data/example_NTU-RGB-D_sketeton.npy \
+                           --config configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml \
+                           --model_file inference/CTRGCNLite/CTRGCNLiteJoint.pdmodel \
+                           --params_file inference/CTRGCNLite/CTRGCNLiteJoint.pdiparams \
+                           --use_gpu=True \
+                           --use_tensorrt=False
+```
+
+输出示例如下:
+
+```
+Current video file: data/example_NTU-RGB-D_sketeton.npy
+        top-1 class: [58]
+        top-1 score: [0.37179583]
+```
+
+可以看到，使用在NTU-RGBD数据集上训练好的ST-GCN模型对`data/example_NTU-RGB-D_sketeton.npy`进行预测，输出的top1类别id为`58`，置信度为0.37179583。
 
 
-👀 🌟  **《产业级视频技术与应用案例》系列课程回放链接**:  https://aistudio.baidu.com/aistudio/course/introduce/6742 🌟
+### 对比普通的export
 
-​																	  💖 **欢迎大家扫码入群讨论** 💖
-<div align="center">
-  <img src="docs/images/user_group.png" width=250/></div>
+```bash
+python3.7 tools/export_model.py -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml \
+                                -p output/CTRGCNLiteJoint/CTRGCNLiteJoint_best.pdparams \
+                                -o inference/CTRGCNLite_norm_export
 
-- 添加成功后回复【视频】加入交流群
+python3.7 tools/predict.py --input_file data/example_NTU-RGB-D_sketeton.npy \
+                           --config configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml \
+                           --model_file inference/CTRGCNLite_norm_export/CTRGCNLiteJoint.pdmodel \
+                           --params_file inference/CTRGCNLite_norm_export/CTRGCNLiteJoint.pdiparams \
+                           --use_gpu=True \
+                           --use_tensorrt=False
+```
+输出结果
+```
+Current video file: data/example_NTU-RGB-D_sketeton.npy
+        top-1 class: [58]
+        top-1 score: [0.37179583]
+```
+模型大小14M,输出结果与最小化导出相同
 
-## 特性
-
-支持多种Video相关前沿算法，在此基础上打造产业级特色模型[PP-TSM](docs/zh-CN/model_zoo/recognition/pp-tsm.md)和[PP-TSMv2](docs/zh-CN/model_zoo/recognition/pp-tsm_v2.md)，并打通数据生产、模型训练、压缩、预测部署全流程。
-
-<div align="center">
-    <img src="./docs/images/features.png" width="700">
-</div>
-
-## 快速开始
-
-- 一行命令快速使用: [快速开始](./docs/zh-CN/quick_start.md)
-
-## 场景应用
-
-PaddleVideo场景应用覆盖体育、互联网、工业、医疗行业，在PP-TSM的基础能力之上，以案例的形式展示利用场景数据微调、模型优化方法、数据增广等内容，为开发者实际落地提供示范与启发。详情可查看[应用](./applications/)。
-
-## 文档教程
-
-- [快速开始](./docs/zh-CN/quick_start.md)
-- [安装说明](./docs/zh-CN/install.md)
-- [训练/测试/推理全流程使用指南](./docs/zh-CN/usage.md)
-- [PP-TSM行为识别🔥](./docs/zh-CN/model_zoo/recognition/pp-tsm.md)
-  - [模型库](./docs/zh-CN/model_zoo/recognition/pp-tsm.md#7)
-  - [模型训练](./docs/zh-CN/model_zoo/recognition/pp-tsm.md#4)
-  - [模型压缩](./deploy/slim/)
-      - [模型量化](./deploy/slim/readme.md)
-      - [知识蒸馏](./docs/zh-CN/distillation.md)
-  - [推理部署](./deploy/)
-      - [基于Python预测引擎推理](./docs/zh-CN/model_zoo/recognition/pp-tsm.md#62)
-      - [基于C++预测引擎推理](./deploy/cpp_infer/readme.md)
-      - [服务端部署](./deploy/python_serving/readme.md)
-      - [Paddle2ONNX模型转化与预测](./deploy/paddle2onnx/readme.md)
-      - [Benchmark](./docs/zh-CN/benchmark.md)
-- [前沿算法与模型](./docs/zh-CN/model_zoo/README.md)🚀
-- [数据集](./docs/zh-CN/dataset/README.md)
-- [场景应用](./applications/README.md)
-- [数据标注](./applications/BILS)
-- [赛事支持](./docs/zh-CN/competition.md)
-- [贡献代码](./docs/zh-CN/contribute/README.md)
-
-## 许可证书
-
-本项目的发布受[Apache 2.0 license](LICENSE)许可认证。

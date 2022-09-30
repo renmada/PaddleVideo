@@ -26,7 +26,7 @@
 - CTRGCNLiteJoint.pd*： inference_model文件
 ## 数据准备
 
-NTU-RGBD数据下载及准备请参考[NTU-RGBD数据准备](dataset/ntu-rgbd.md)
+NTU-RGBD数据下载及准备请参考[NTU-RGBD数据准备](docs/zh-CN/dataset/ntu-rgbd.md)
 
 ## 模型训练
 

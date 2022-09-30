@@ -53,7 +53,7 @@ __all__ = [
     'ResNetTweaksTSN', 'VisionTransformer', 'STGCN', 'AGCN', 'TransNetV2',
     'ADDS_DepthNet', 'VisionTransformer_tweaks', 'BertForMultiModalPreTraining',
     'ResNetTSN_MRI', 'ResNetTSM_MRI', 'ResNetSlowFast_MRI', 'CFBI', 'MSTCN',
-    'ASRF', 'MoViNet', 'SwinTransformer3D', 'CTRGCN', 'CTRGCNLite'
+    'ASRF', 'MoViNet', 'SwinTransformer3D', 'CTRGCN', 'CTRGCNLite',
     'TokenShiftVisionTransformer', 'AGCN2s', 'PPTSM_MobileNetV2',
     'PPTSM_MobileNetV3', 'PPTSM_v2', 'ResNet3dSlowOnly'
 ]

@@ -82,7 +82,7 @@ def trim_config(cfg):
 
 def get_input_spec(cfg, model_name):
 
-    if model_name in ['STGCN', 'AGCN', 'CTRGCN', 'CTRGCN_joint']:
+    if model_name in ['STGCN', 'AGCN', 'CTRGCN', 'CTRGCN_joint', 'CTRGCNLiteJoint']:
         input_spec = [
             InputSpec(shape=[
                 None, cfg.num_channels, cfg.window_size, cfg.vertex_nums,

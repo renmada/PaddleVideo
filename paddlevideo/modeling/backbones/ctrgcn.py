@@ -135,8 +135,8 @@ class MultiScale_TemporalConv(nn.Layer):
 
         super(MultiScale_TemporalConv, self).__init__()
         assert out_channels % (
-            len(dilations) +
-            2) == 0, '# out channels should be multiples of # branches'
+                len(dilations) +
+                2) == 0, '# out channels should be multiples of # branches'
 
         # Multiple branches of temporal convolution
         self.num_branches = len(dilations) + 2
@@ -383,7 +383,7 @@ class NTUDGraph:
         Dn = np.zeros((w, w))
         for i in range(w):
             if Dl[i] > 0:
-                Dn[i, i] = Dl[i]**(-1)
+                Dn[i, i] = Dl[i] ** (-1)
         AD = np.dot(A, Dn)
         return AD
 
@@ -512,3 +512,39 @@ class CTRGCN(nn.Layer):
         x = self.l10(x)
 
         return x, N, M
+
+
+@BACKBONES.register()
+class CTRGCNLite(CTRGCN):
+    """
+    Args:
+        num_point: int, numbers of sketeton point.
+        num_person: int, numbers of person.
+        base_channel: int, model's hidden dim.
+        graph: str, sketeton adjacency matrix name.
+        graph_args: dict, sketeton adjacency graph class args.
+        in_channels: int, channels of vertex coordinate. 2 for (x,y), 3 for (x,y,z). Default 3.
+        adaptive: bool, if adjacency matrix can adaptive.
+    """
+
+    def __init__(self,
+                 num_point=25,
+                 num_person=2,
+                 base_channel=64,
+                 graph='ntu_rgb_d',
+                 graph_args=dict(),
+                 in_channels=3,
+                 adaptive=True,
+                 remove_l9=False):
+        super(CTRGCNLite, self).__init__(
+            num_point,
+            num_person,
+            base_channel,
+            graph,
+            graph_args,
+            in_channels,
+            adaptive)
+
+        self.l10 = nn.Identity()
+        if remove_l9:
+            self.l9 = nn.Identity()

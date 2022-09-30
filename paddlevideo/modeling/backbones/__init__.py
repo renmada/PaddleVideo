@@ -39,7 +39,7 @@ from .resnet_tsn_MRI import ResNetTSN_MRI
 from .resnet_tsm_MRI import ResNetTSM_MRI
 from .resnet_slowfast_MRI import ResNetSlowFast_MRI
 from .cfbi import CFBI
-from .ctrgcn import CTRGCN
+from .ctrgcn import CTRGCN, CTRGCNLite
 from .agcn2s import AGCN2s
 from .movinet import MoViNet
 from .resnet3d_slowonly import ResNet3dSlowOnly
@@ -53,7 +53,7 @@ __all__ = [
     'ResNetTweaksTSN', 'VisionTransformer', 'STGCN', 'AGCN', 'TransNetV2',
     'ADDS_DepthNet', 'VisionTransformer_tweaks', 'BertForMultiModalPreTraining',
     'ResNetTSN_MRI', 'ResNetTSM_MRI', 'ResNetSlowFast_MRI', 'CFBI', 'MSTCN',
-    'ASRF', 'MoViNet', 'SwinTransformer3D', 'CTRGCN',
+    'ASRF', 'MoViNet', 'SwinTransformer3D', 'CTRGCN', 'CTRGCNLite'
     'TokenShiftVisionTransformer', 'AGCN2s', 'PPTSM_MobileNetV2',
     'PPTSM_MobileNetV3', 'PPTSM_v2', 'ResNet3dSlowOnly'
 ]

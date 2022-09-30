@@ -8,6 +8,7 @@
 - [模型训练](#模型训练)
 - [模型测试](#模型测试)
 - [模型推理](#模型推理)
+- [自动化测试脚本](#自动化测试脚本)
 
 ## 轻量化方法介绍
 本repo通过精简模型结构、数据增强、模型蒸馏和最小化转静态模型的方法，在inference模型小于10M条件下，在NTU-RGB+D数据集，joint模态，X-sub评测标准，Top1 acc达到 *90.87* 
@@ -108,3 +109,27 @@ Current video file: data/example_NTU-RGB-D_sketeton.npy
 ```
 模型大小14M,输出结果与最小化导出相同
 
+## 自动化测试脚本
+详细日志在test_tipc/output
+
+TIPC: test_tipc/README.md
+
+首先安装auto_log，需要进行安装，安装方式如下：
+
+```shell
+pip install  https://paddleocr.bj.bcebos.com/libs/auto_log-1.2.0-py3-none-any.whl
+```
+进行TIPC：
+1. 需完成前面的[数据准备](#数据准备)
+2. 运行测试
+```shell
+bash test_tipc/test_train_inference_python.sh test_tipc/configs/VoVNet/VoVNet39_train_infer_python.txt 'lite_train_lite_infer'
+```
+TIPC结果：
+如果运行成功，在终端中会显示下面的内容，具体的日志也会输出到test_tipc/output/文件夹中的文件中。
+```
+Run successfully with command - CTRGCNLiteJoint - python3.7 main.py -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml --seed 1234 -o DATASET.train.file_path="data/ntu-rgb-d/xsub/train_data.npy" -o DATASET.train.label_path="data/ntu-rgb-d/xsub/train_label.pkl" -o DATASET.valid.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.valid.label_path="data/ntu-rgb-d/xsub/val_label.pkl" -o DATASET.test.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.test.label_path="data/ntu-rgb-d/xsub/val_label.pkl" --max_iters=30      -o output_dir=./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1 -o epochs=1   -o DATASET.batch_size=32     > ./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/train.log 2>&1 - ./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1.log 
+Run successfully with command - CTRGCNLiteJoint - python3.7 main.py --test -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml -o DATASET.train.file_path="data/ntu-rgb-d/xsub/train_data.npy" -o DATASET.train.label_path="data/ntu-rgb-d/xsub/train_label.pkl" -o DATASET.valid.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.valid.label_path="data/ntu-rgb-d/xsub/val_label.pkl" -o DATASET.test.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.test.label_path="data/ntu-rgb-d/xsub/val_label.pkl"   -w=./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1/CTRGCNLiteJoint_epoch_00001.pdparams > ./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1_eval.log 2>&1  - ./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1_eval.log 
+Run successfully with command - CTRGCNLiteJoint - python3.7 tools/minimal_export_model.py -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml --save_name inference -p=./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1/CTRGCNLiteJoint_epoch_00001.pdparams -o=./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1 > ./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1_export.log 2>&1  - ./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1_export.log 
+Run successfully with command - CTRGCNLiteJoint - python3.7 tools/predict.py --config configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml --use_gpu=False --enable_mkldnn=False --cpu_threads=1 --model_file=./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1/inference.pdmodel --batch_size=1 --input_file=./data/example_NTU-RGB-D_sketeton.npy --enable_benchmark=True --precision=fp32 --params_file=./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/norm_train_gpus_0_autocast_null_nodes_1/inference.pdiparams > ./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/python_infer_cpu_gpus_0_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log 2>&1  - ./test_tipc/output/CTRGCNLiteJoint/lite_train_lite_infer/python_infer_cpu_gpus_0_usemkldnn_False_threads_1_precision_fp32_batchsize_1.log 
+```

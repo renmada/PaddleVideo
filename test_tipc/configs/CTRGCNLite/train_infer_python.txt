@@ -13,7 +13,7 @@ train_infer_video_dir:null
 null:null
 ##
 trainer:norm_train
-norm_train:main.py -c configs/recognition/ctrgcn/ctrgcn_small_ntucs_joint_dml.yaml --seed 1234 -o DATASET.train.file_path="data/ntu-rgb-d/xsub/train_data.npy" -o DATASET.train.label_path="data/ntu-rgb-d/xsub/train_label.pkl" -o DATASET.valid.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.valid.label_path="data/ntu-rgb-d/xsub/val_label.pkl" -o DATASET.test.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.test.label_path="data/ntu-rgb-d/xsub/val_label.pkl"
+norm_train:main.py -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml --seed 1234 -o DATASET.train.file_path="data/ntu-rgb-d/xsub/train_data.npy" -o DATASET.train.label_path="data/ntu-rgb-d/xsub/train_label.pkl" -o DATASET.valid.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.valid.label_path="data/ntu-rgb-d/xsub/val_label.pkl" -o DATASET.test.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.test.label_path="data/ntu-rgb-d/xsub/val_label.pkl"
 pact_train:null
 fpgm_train:null
 distill_train:null
@@ -21,13 +21,13 @@ null:null
 null:null
 ##
 ===========================eval_params===========================
-eval:main.py --test -c configs/recognition/ctrgcn/ctrgcn_small_ntucs_joint_dml.yaml -o DATASET.train.file_path="data/ntu-rgb-d/xsub/train_data.npy" -o DATASET.train.label_path="data/ntu-rgb-d/xsub/train_label.pkl" -o DATASET.valid.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.valid.label_path="data/ntu-rgb-d/xsub/val_label.pkl" -o DATASET.test.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.test.label_path="data/ntu-rgb-d/xsub/val_label.pkl"
+eval:main.py --test -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml -o DATASET.train.file_path="data/ntu-rgb-d/xsub/train_data.npy" -o DATASET.train.label_path="data/ntu-rgb-d/xsub/train_label.pkl" -o DATASET.valid.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.valid.label_path="data/ntu-rgb-d/xsub/val_label.pkl" -o DATASET.test.file_path="data/ntu-rgb-d/xsub/val_data.npy" -o DATASET.test.label_path="data/ntu-rgb-d/xsub/val_label.pkl"
 -w:./test_tipc/output/CTRGCNLite/CTRGCN_joint_epoch_00001.pdparams
 ##
 ===========================infer_params===========================
 -o:inference/CTRGCNLite
 -p:null
-norm_export:tools/minimal_export_model.py -c configs/recognition/ctrgcn/ctrgcn_small_ntucs_joint_dml.yaml --save_name inference
+norm_export:tools/minimal_export_model.py -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml --save_name inference
 quant_export:null
 fpgm_export:null
 distill_export:null
@@ -35,9 +35,9 @@ export1:null
 export2:null
 inference_dir:null
 infer_model:./data/AGCN_fsd.pdparams
-infer_export:tools/minimal_export_model.py -c configs/recognition/ctrgcn/ctrgcn_small_ntucs_joint_dml.yaml
+infer_export:tools/minimal_export_model.py -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml
 infer_quant:False
-inference:tools/predict.py --config configs/recognition/ctrgcn/ctrgcn_small_ntucs_joint_dml.yaml
+inference:tools/predict.py --config configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml
 --use_gpu:True|False
 --enable_mkldnn:False
 --cpu_threads:1|6

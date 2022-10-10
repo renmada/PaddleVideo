@@ -17,11 +17,11 @@
 - 模型蒸馏：使用dml方法，初始化权重为89.93的Paddlevideo精度CTRGCN的模型
 - 最小化导出：使用nn.Sequential定义的模型导出静态图模型尺寸小于nn.Layer定义的导出
 ## 模型精度
-| split | modality | Top-1 |                                                   checkpoints                                                   |
-| :----: | :----: |:-----:|:---------------------------------------------------------------------------------------------------------------:|
-| cross-subject | joint | 90.87 | [CTRGCNLiteJoint_best.pdparams](https://pan.baidu.com/s/1qCed-vpQ1dEz7GpKNr20LQ?pwd=3dtv) |
+| split | modality |       Top-1       |                                                   checkpoints                                                   |
+| :----: | :----: |:-----------------:|:---------------------------------------------------------------------------------------------------------------:|
+| cross-subject | joint | 90.95467329025269 | [CTRGCNLiteJoint_best.pdparams](https://pan.baidu.com/s/12PiDBq0psb7tDcwjcl2d8w?pwd=sqbt) |
 ### 模型和日志
-[下载地址](https://pan.baidu.com/s/1qCed-vpQ1dEz7GpKNr20LQ?pwd=3dtv)
+[下载地址](https://pan.baidu.com/s/12PiDBq0psb7tDcwjcl2d8w?pwd=sqbt)
 - CTRGCN_ntucs_joint_dml.pdparams：初始化的权重，转至PaddleVideo训练好的[模型](https://videotag.bj.bcebos.com/PaddleVideo-release2.3/CTRGCN_ntucs_joint.pdparams)
 - train.log： 日志
 - CTRGCNLiteJoint.pd*： inference_model文件

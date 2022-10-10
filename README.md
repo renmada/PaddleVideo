@@ -11,7 +11,7 @@
 - [自动化测试脚本](#自动化测试脚本)
 
 ## 轻量化方法介绍
-本repo通过精简模型结构、数据增强、模型蒸馏和最小化转静态模型的方法，在inference模型小于10M条件下，在NTU-RGB+D数据集，joint模态，X-sub评测标准，Top1 acc达到 *90.87* 
+本repo通过精简模型结构、数据增强、模型蒸馏和最小化转静态模型的方法，在inference模型小于10M条件下，在NTU-RGB+D数据集，joint模态，X-sub评测标准，Top1 acc达到 *90.954* 
 - 精简模型结构：去掉backbone的l10(第十层TCN_GCN_unit)
 - 数据增强：使用mixup方法
 - 模型蒸馏：使用dml方法，初始化权重为89.93的Paddlevideo精度CTRGCN的模型

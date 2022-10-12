@@ -36,7 +36,7 @@ NTU-RGBD数据下载及准备请参考[NTU-RGBD数据准备](docs/zh-CN/dataset/
 ### NTU-RGBD数据集训练
 
 - NTU-RGBD数据集单卡训练，启动命令如下：
-训练更好的teacher
+  训练更好的teacher
 ```bash
 # joint modality
 python main.py --validate -c configs/recognition/ctrgcn/ctrgcn_ntucs_bone_joint_dml.yaml \
@@ -55,6 +55,7 @@ for k, v in s.items():
         new_s[k.replace('Student', 'Teacher')] = v
 paddle.save(new_s, 'data/CTRGCN_ntucs_joint_dml2.pdparams')
 ```
+dml训练
 ```bash
 # joint modality
 python main.py --validate -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml \

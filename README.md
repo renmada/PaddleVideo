@@ -11,19 +11,21 @@
 - [自动化测试脚本](#自动化测试脚本)
 
 ## 轻量化方法介绍
-本repo通过精简模型结构、数据增强、模型蒸馏和最小化转静态模型的方法，在inference模型小于10M条件下，在NTU-RGB+D数据集，joint模态，X-sub评测标准，Top1 acc达到 *90.954* 
+本repo通过精简模型结构、数据增强、模型蒸馏和最小化转静态模型的方法，在inference模型小于10M条件下，在NTU-RGB+D数据集，joint模态，X-sub评测标准，Top1 acc达到 *90.967* 
 - 精简模型结构：去掉backbone的l10(第十层TCN_GCN_unit)
 - 数据增强：使用mixup方法
-- 模型蒸馏：使用dml方法，初始化权重为89.93的Paddlevideo精度CTRGCN的模型
+- 模型蒸馏：先训练teacher再蒸馏训练轻量模型
 - 最小化导出：使用nn.Sequential定义的模型导出静态图模型尺寸小于nn.Layer定义的导出
 ## 模型精度
-| split | modality |       Top-1       |                                                   checkpoints                                                   |
-| :----: | :----: |:-----------------:|:---------------------------------------------------------------------------------------------------------------:|
-| cross-subject | joint | 90.95467329025269 | [CTRGCNLiteJoint_best.pdparams](https://pan.baidu.com/s/12PiDBq0psb7tDcwjcl2d8w?pwd=sqbt) |
+| split | modality |   Top-1    |                                                   checkpoints                                                   |
+| :----: | :----: |:----------:|:---------------------------------------------------------------------------------------------------------------:|
+| cross-subject | joint | 90.9667849 | [CTRGCNLiteJoint_best.pdparams](https://pan.baidu.com/s/1yVknsybSz8crgMRftNn0yw?pwd=sb1q) |
 ### 模型和日志
 [下载地址](https://pan.baidu.com/s/12PiDBq0psb7tDcwjcl2d8w?pwd=sqbt)
-- CTRGCN_ntucs_joint_dml.pdparams：初始化的权重，转至PaddleVideo训练好的[模型](https://videotag.bj.bcebos.com/PaddleVideo-release2.3/CTRGCN_ntucs_joint.pdparams)
-- train.log： 日志
+- CTRGCN_ntucs_joint_dml.pdparams：初始化的权重，转至PaddleVideo训练好的[模型](https://pan.baidu.com/s/1yVknsybSz8crgMRftNn0yw?pwd=sb1q)
+- CTRGCN_ntucs_joint_dml2.pdparams：优化后的的dml_teacher模型
+- train1.log： 训练teacher的日志
+- train2.log： 训练轻量模型的日志
 - CTRGCNLiteJoint.pd*： inference_model文件
 ## 数据准备
 
@@ -34,11 +36,29 @@ NTU-RGBD数据下载及准备请参考[NTU-RGBD数据准备](docs/zh-CN/dataset/
 ### NTU-RGBD数据集训练
 
 - NTU-RGBD数据集单卡训练，启动命令如下：
+训练更好的teacher
+```bash
+# joint modality
+python main.py --validate -c configs/recognition/ctrgcn/ctrgcn_ntucs_bone_joint_dml.yaml \
+-w data/CTRGCN_ntucs_joint_dml.pdparams
+```
+转换权重
+```python
+import paddle
+s = 'output/CTRGCNLiteJoint/CTRGCJoint_best.pdparams'
+new_s = {}
+s = paddle.load(s)
+for k, v in s.items():
+    if k.startswith('Student'):
 
+        new_s[k] = v
+        new_s[k.replace('Student', 'Teacher')] = v
+paddle.save(new_s, 'data/CTRGCN_ntucs_joint_dml2.pdparams')
+```
 ```bash
 # joint modality
 python main.py --validate -c configs/recognition/ctrgcn/ctrgcn_lite_ntucs_joint_dml.yaml \
--w data/CTRGCN_ntucs_joint_dml.pdparams
+-w data/CTRGCN_ntucs_joint_dml2.pdparams
 ```
 ## 模型测试
 
@@ -81,10 +101,10 @@ python3.7 tools/predict.py --input_file data/example_NTU-RGB-D_sketeton.npy \
 ```
 Current video file: data/example_NTU-RGB-D_sketeton.npy
         top-1 class: [58]
-        top-1 score: [0.37179583]
+        top-1 score: [0.86925286]
 ```
 
-可以看到，使用在NTU-RGBD数据集上训练好的ST-GCN模型对`data/example_NTU-RGB-D_sketeton.npy`进行预测，输出的top1类别id为`58`，置信度为0.37179583。
+可以看到，使用在NTU-RGBD数据集上训练好的ST-GCN模型对`data/example_NTU-RGB-D_sketeton.npy`进行预测，输出的top1类别id为`58`，置信度为0.86925286。
 
 
 ### 对比普通的export
@@ -105,7 +125,7 @@ python3.7 tools/predict.py --input_file data/example_NTU-RGB-D_sketeton.npy \
 ```
 Current video file: data/example_NTU-RGB-D_sketeton.npy
         top-1 class: [58]
-        top-1 score: [0.37179583]
+        top-1 score: [0.86925286]
 ```
 模型大小14M,输出结果与最小化导出相同
 
